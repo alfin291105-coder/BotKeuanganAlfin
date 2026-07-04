@@ -1,0 +1,17 @@
+{
+  "name": "bot-keuangan-alfin",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.107.0"
+  },
+  "dependencies": {
+    "googleapis": "^173.0.0",
+    "jose": "^6.2.3"
+  }
+}
