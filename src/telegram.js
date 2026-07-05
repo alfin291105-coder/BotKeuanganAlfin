@@ -1,6 +1,6 @@
 export async function kirimPesan(token, chatId, text) {
 
-  await fetch(
+  const res = await fetch(
     `https://api.telegram.org/bot${token}/sendMessage`,
     {
       method: "POST",
@@ -13,5 +13,7 @@ export async function kirimPesan(token, chatId, text) {
       })
     }
   );
+
+  return res.json();
 
 }
