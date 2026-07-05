@@ -121,18 +121,28 @@ function scanTransaksi(data, callback) {
 export default {
   async fetch(request, env) {
 
-    if (request.method !== "POST") {
-      return new Response("Bot Telegram Cloudflare Aktif ✅");
-    }
+  if (request.method !== "POST") {
+    return new Response("Bot Telegram Cloudflare Aktif ✅");
+  }
 
-    const update = await request.json();
+  let update = {};
 
-    if (!update.message) {
-      return new Response("OK");
-    }
+  try {
+    update = await request.json();
+  } catch (e) {
+    return new Response("OK - no JSON");
+  }
 
-    const chatId = update.message.chat.id;
-    const text = update.message.text || "";
+  if (!update.message) {
+    return new Response("OK");
+  }
+
+  const chatId = Number(update.message.chat.id);
+  const text = update.message.text || "";
+
+  console.log("UPDATE:", JSON.stringify(update));
+  console.log("CHAT_ID:", chatId);
+  console.log("TEXT:", text);
 
     // Hanya pemilik
     if (chatId !== 8081656707) {
@@ -806,7 +816,7 @@ try {
 
 async function kirimPesan(token, chatId, text) {
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -817,6 +827,8 @@ async function kirimPesan(token, chatId, text) {
     })
   });
 
+  const data = await res.json();
+  console.log("TELEGRAM RESPONSE:", data);
 }
 
 async function getFile(token, fileId) {
