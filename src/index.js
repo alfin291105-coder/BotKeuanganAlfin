@@ -183,7 +183,7 @@ export default {
 /laporanharian
 /laporanbulanan
 /laporantahunan
-/hapus`
+/hapus Laporan`
       );
 
       return new Response("OK");
