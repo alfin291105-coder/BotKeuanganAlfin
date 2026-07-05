@@ -2,8 +2,9 @@ import {
   appendRow,
   getValue,
   getColumn,
-  getTransactions
-  } from "./google.js";
+  getTransactions,
+  deleteRow
+} from "./google.js";
 
   function formatJam() {
   return new Date().toLocaleTimeString("id-ID", {
@@ -540,6 +541,85 @@ Periode : ${tahun}
   } catch (err) {
 
     console.error(err);
+
+    await kirimPesan(
+      env.BOT_TOKEN,
+      chatId,
+      "❌ " + err.message
+    );
+
+  }
+
+  return new Response("OK");
+
+}
+
+// ==========================
+// /hapus
+// ==========================
+
+if (text.startsWith("/hapus")) {
+
+  const bagian = text.trim().split(" ");
+
+  if (bagian.length !== 2) {
+
+    await kirimPesan(
+      env.BOT_TOKEN,
+      chatId,
+`Gunakan format:
+
+/hapus KODE_TRANSAKSI
+
+Contoh:
+/hapus ALF-OUT-20260705-ABCD`
+    );
+
+    return new Response("OK");
+
+  }
+
+  const kode = bagian[1].trim();
+
+  try {
+
+    const data = await getTransactions(env);
+
+    let rowIndex = -1;
+
+    for (let i = 1; i < data.length; i++) {
+
+      if (data[i][6] === kode) {
+
+        rowIndex = i;
+
+        break;
+
+      }
+
+    }
+
+    if (rowIndex === -1) {
+
+      await kirimPesan(
+        env.BOT_TOKEN,
+        chatId,
+        "❌ Kode transaksi tidak ditemukan."
+      );
+
+      return new Response("OK");
+
+    }
+
+    await deleteRow(env, rowIndex);
+
+    await kirimPesan(
+      env.BOT_TOKEN,
+      chatId,
+      `✅ Transaksi ${kode} berhasil dihapus.`
+    );
+
+  } catch (err) {
 
     await kirimPesan(
       env.BOT_TOKEN,

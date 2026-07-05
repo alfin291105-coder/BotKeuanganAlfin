@@ -2,6 +2,11 @@ import { SignJWT, importPKCS8 } from "jose";
 
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
+const SPREADSHEET_ID =
+  "1-pjFmtnzCALeqFPQUvEGa3E5RapIeQ1H3aQNHHO-PvI";
+
+const SHEET_ID = 0;
+
 export async function getAccessToken(env) {
   const creds = JSON.parse(env.GOOGLE_CREDENTIALS);
 
@@ -56,13 +61,10 @@ export async function appendRow(env, values) {
 
   const token = await getAccessToken(env);
 
-  const spreadsheetId =
-    "1-pjFmtnzCALeqFPQUvEGa3E5RapIeQ1H3aQNHHO-PvI";
-
   const range = encodeURIComponent("'Data Transaksi'!A:G");
 
   const url =
-`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`;
+`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=USER_ENTERED`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -88,11 +90,8 @@ export async function getValue(env, range) {
 
   const token = await getAccessToken(env);
 
-  const spreadsheetId =
-    "1-pjFmtnzCALeqFPQUvEGa3E5RapIeQ1H3aQNHHO-PvI";
-
-  const url =
-`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`;
+    const url = 
+    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}`;
 
   const res = await fetch(url, {
     headers: {
@@ -123,5 +122,44 @@ export async function getTransactions(env) {
     env,
     "'Data Transaksi'!A:G"
   );
+
+}
+
+export async function deleteRow(env, rowIndex) {
+
+  const token = await getAccessToken(env);
+
+  const url =
+`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}:batchUpdate`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: SHEET_ID,
+              dimension: "ROWS",
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1
+            }
+          }
+        }
+      ]
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(JSON.stringify(data));
+  }
+
+  return data;
 
 }
