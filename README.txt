@@ -1,3 +1,5 @@
-Update  : npm wrangler deploy
-log     : npm wrangler tail
-start   : npm wrangler dev
+git status
+git add.
+git status
+git commit -m "Refactor tahap"
+git push origin main
