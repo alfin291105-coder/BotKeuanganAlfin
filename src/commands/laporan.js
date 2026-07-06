@@ -42,16 +42,7 @@ Tanggal : ${hariIni}
 
       scanTransaksi(data, (trx) => {
 
-        const tgl = new Date(trx.tanggal);
-
-const hariIni = new Date();
-hariIni.setHours(0,0,0,0);
-
-const trxDate = new Date(tgl);
-trxDate.setHours(0,0,0,0);
-
-if (trxDate.getTime() !== hariIni.getTime()) return;
-
+        if (trx.tanggal !== hariIni) return;
         jumlah++;
 
         if (trx.jenis === "Pemasukan") {
