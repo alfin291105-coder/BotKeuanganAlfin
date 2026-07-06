@@ -6,6 +6,10 @@ import {
   handleSaldo
 } from "./commands/saldo.js";
 
+import {
+  handleLaporan
+} from "./commands/laporan.js";
+
 export async function handleCommand(
   text,
   chatId,
@@ -27,6 +31,15 @@ export async function handleCommand(
   )) {
     return true;
   }
+
+  if (
+  await handleLaporan(
+    text,
+    chatId,
+    env
+  )) {
+    return true;
+}
 
   return false;
 
