@@ -1,4 +1,8 @@
 import {
+  handleCommand
+} from "./commandHandler.js";
+
+import {
   scanAzureVision,
   parseStruk
 } from "./ocr.js";
@@ -99,156 +103,7 @@ export default {
       return new Response("OK");
     }
 
-    // ==========================
-    // /start
-    // ==========================
-    if (text === "/start") {
-
-      await kirimPesan(
-        env.BOT_TOKEN,
-        chatId,
-`🤖 Bot Catatan Keuangan Alfin
-
-📝 CARA PENULISAN
-
-✅ Pemasukan
-(masuk) (100000) (Gaji) (Bonus)
-
-❌ Pengeluaran
-(keluar) (25000) (Toko) (Makan&Minum)
-
-📊 PERINTAH
-
-/ceksaldo
-/laporanharian
-/laporanbulanan
-/laporantahunan
-/hapus Laporan`
-      );
-
-      return new Response("OK");
-    }
-
-    // ==========================
-    // /ceksaldo
-    // ==========================
-
-
-    if (text === "/ceksaldo") {
-
-  try {
-
-    const data = await getValue(
-      env,
-      "'Data Transaksi'!H2"
-    );
-
-    const saldo =
-      data[0]?.[0] || "Rp0";
-
-    await kirimPesan(
-      env.BOT_TOKEN,
-      chatId,
-`💰 SALDO SAAT INI
-
-${saldo}
-
-🏦 BANK BNI
-1811280080`
-    );
-
-  } catch (err) {
-
-    await kirimPesan(
-      env.BOT_TOKEN,
-      chatId,
-      "❌ Gagal membaca saldo.\n\n" + err.message
-    );
-
-  }
-
-  return new Response("OK");
-}
-
-// ==========================
-// /laporanharian
-// ==========================
-
-if (text === "/laporanharian") {
-
-  try {
-
-    const data = await getTransactions(env);
-    const hariIni = formatTanggal();
-
-    let pesan =
-`📅 LAPORAN HARIAN
-
-Tanggal : ${hariIni}
-
-`;
-
-    let pemasukan = 0;
-    let pengeluaran = 0;
-    let jumlah = 0;
-
-    scanTransaksi(data, (trx) => {
-
-  if (trx.tanggal !== hariIni) return;
-
-  jumlah++;
-
-  if (trx.jenis === "Pemasukan") {
-    pemasukan += trx.nominal;
-  } else {
-    pengeluaran += Math.abs(trx.nominal);
-  }
-
-  pesan +=
-`${trx.jenis === "Pemasukan" ? "🟢" : "🔴"} ${trx.kode}
-
-🏪 ${trx.sumber}
-📝 ${trx.keterangan}
-💰 Rp${Math.abs(trx.nominal).toLocaleString("id-ID")}
-
-────────────────
-
-`;
-
-});
-    if (jumlah === 0) {
-
-      pesan += "Belum ada transaksi hari ini.";
-
-    } else {
-
-      pesan +=
-`📊 RINGKASAN
-
-🟢 Pemasukan : Rp${pemasukan.toLocaleString("id-ID")}
-🔴 Pengeluaran : Rp${pengeluaran.toLocaleString("id-ID")}
-💰 Saldo : Rp${(pemasukan - pengeluaran).toLocaleString("id-ID")}
-
-📄 Total Transaksi : ${jumlah}`;
-
-    }
-
-    await kirimPesan(
-      env.BOT_TOKEN,
-      chatId,
-      pesan
-    );
-
-  } catch (err) {
-
-    await kirimPesan(
-      env.BOT_TOKEN,
-      chatId,
-      "❌ " + err.message
-    );
-
-  }
-
+if (await handleCommand(text, chatId, env)) {
   return new Response("OK");
 }
 
