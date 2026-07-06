@@ -25,6 +25,7 @@ export async function handleStart(text, chatId, env) {
 
 /ceksaldo
 /laporanharian
+/laporanmingguan
 /laporanbulanan
 /laporantahunan
 /hapus Laporan`
