@@ -1,4 +1,4 @@
-async function scanAzureVision(imageUrl, env) {
+export async function scanAzureVision(imageUrl, env) {
 
   const endpoint =
     `${env.AZURE_VISION_ENDPOINT}computervision/imageanalysis:analyze?api-version=2024-02-01&features=read`;
@@ -25,7 +25,7 @@ async function scanAzureVision(imageUrl, env) {
 
 }
 
-function parseStruk(lines) {
+export function parseStruk(lines) {
 
   const data = {
   jenis: "Pengeluaran",
