@@ -275,7 +275,7 @@ Periode : ${bulan}-${tahun}
 
       if (pesan.length + transaksi.length >= MAX) {
 
-        await kirimPesan(
+          kirimPesan(
           env.BOT_TOKEN,
           chatId,
           pesan
@@ -386,7 +386,7 @@ Periode : ${tahun}
 
       if (pesan.length + transaksi.length >= MAX) {
 
-        await kirimPesan(
+          kirimPesan(
           env.BOT_TOKEN,
           chatId,
           pesan
