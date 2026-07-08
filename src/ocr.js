@@ -44,6 +44,13 @@ function detectReceiptType(lines) {
     return "PERTAMINA";
   }
 
+  if (
+    text.includes("WONDR") ||
+    text.includes("TRANSFER BERHASIL") ||
+    text.includes("REF ID")) {
+    return "WONDR";
+  }
+
   if (text.includes("ALFAMART")) {
     return "ALFAMART";
   }
@@ -116,6 +123,90 @@ function parsePertamina(lines) {
 
 }
 
+function parseWondr(lines) {
+
+  const data = {
+    jenis: "Pemasukan",
+    toko: "BNI WONDR",
+    tanggal: "",
+    jam: "",
+    total: 0,
+    metode: "Transfer Bank",
+    keterangan: ""
+  };
+
+  for (const line of lines) {
+
+    // Nominal
+    if (line.includes("Rp")) {
+
+      const m = line.match(/Rp([\d.]+)/);
+
+      if (m && data.total === 0) {
+        data.total = Number(
+          m[1].replace(/\./g, "")
+        );
+      }
+
+    }
+
+    // tanggal
+    if (line.includes("Jul") && line.includes("WIB")) {
+
+      const m = line.match(
+        /(\d{2})\s(\w+)\s(\d{4}).*(\d{2}:\d{2}:\d{2})/
+      );
+
+      if (m) {
+
+        const bulan = {
+          Jan:"01",
+          Feb:"02",
+          Mar:"03",
+          Apr:"04",
+          Mei:"05",
+          Jun:"06",
+          Jul:"07",
+          Agu:"08",
+          Sep:"09",
+          Okt:"10",
+          Nov:"11",
+          Des:"12"
+        };
+
+        data.tanggal =
+          `${m[1]}/${bulan[m[2]]}/${m[3]}`;
+
+        data.jam = m[4];
+
+      }
+
+    }
+
+    // penerima
+    if (
+      line &&
+      line === line.toUpperCase() &&
+      line.includes(" ")
+    ) {
+
+      if (
+        !line.includes("TRANSFER") &&
+        !line.includes("BNI")
+      ) {
+
+        data.keterangan =
+          "Transfer ke " + line;
+
+      }
+
+    }
+
+  }
+
+  return data;
+
+}
 
 function parseAlfamart(lines) {
 
@@ -232,6 +323,9 @@ export function parseStruk(lines) {
 
     case "ALFAMART":
       return parseAlfamart(lines);
+
+    case "WONDR":
+      return parseWondr(lines);
 
     default:
       return {
