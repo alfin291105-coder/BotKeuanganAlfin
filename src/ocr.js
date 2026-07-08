@@ -3,18 +3,25 @@ export async function scanAzureVision(imageUrl, env) {
   const endpoint =
     `${env.AZURE_VISION_ENDPOINT}computervision/imageanalysis:analyze?api-version=2024-02-01&features=read`;
 
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Ocp-Apim-Subscription-Key": env.AZURE_VISION_KEY,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      url: imageUrl
-    })
-  });
+  console.log("OCR Endpoint:", endpoint);
 
-const data = await res.json();
+const res = await fetch(endpoint, {
+  method: "POST",
+  headers: {
+    "Ocp-Apim-Subscription-Key": env.AZURE_VISION_KEY,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    url: imageUrl
+  })
+});
+
+console.log("Status:", res.status);
+
+const text = await res.text();
+console.log("Raw Azure:", text);
+
+const data = JSON.parse(text);
 
 console.log("AZURE RESPONSE:", JSON.stringify(data, null, 2));
 
@@ -24,10 +31,6 @@ const lines =
   ) || [];
 
 console.log("OCR LINES:", JSON.stringify(lines, null, 2));
-
-return lines;
-
-console.log("OCR LINES:", lines);
 
 return lines;
 
