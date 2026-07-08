@@ -183,24 +183,33 @@ function parseWondr(lines) {
 
     }
 
-    // penerima
+    // Sumber dana
+const idx = lines.findIndex(
+  x => x.toUpperCase().includes("SUMBER DANA")
+);
+
+if (idx !== -1) {
+
+  for (let i = idx + 1; i < lines.length; i++) {
+
+    const nama = lines[i].trim();
+
+    // Lewati baris yang bukan nama
     if (
-      line &&
-      line === line.toUpperCase() &&
-      line.includes(" ")
+      nama === "" ||
+      nama.includes("BNI") ||
+      nama.includes("*") ||
+      nama.includes("DETAIL") ||
+      nama.includes("NOMINAL")
     ) {
-
-      if (
-        !line.includes("TRANSFER") &&
-        !line.includes("BNI")
-      ) {
-
-        data.keterangan =
-          "Transfer ke " + line;
-
-      }
-
+      continue;
     }
+
+    data.keterangan = "Transfer dari " + nama;
+    break;
+  }
+
+}
 
   }
 
