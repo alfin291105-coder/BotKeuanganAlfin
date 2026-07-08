@@ -315,6 +315,7 @@ function parseAlfamart(lines) {
 export function parseStruk(lines) {
 
   const tipe = detectReceiptType(lines);
+  console.log("RECEIPT TYPE:", tipe);
 
   switch (tipe) {
 
