@@ -40,6 +40,8 @@ function detectReceiptType(lines) {
 
   const text = lines.join(" ").toUpperCase();
 
+  console.log("DETECT TEXT:", text);
+
   if (text.includes("PERTAMINA") || text.includes("SPBU")) {
     return "PERTAMINA";
   }
@@ -52,10 +54,9 @@ function detectReceiptType(lines) {
   }
 
   if (
-  text.includes("TARIK TUNAI") ||
-  text.includes("ATMI") ||
-  text.includes("ATMI")
-) {
+    text.includes("TARIK TUNAI") ||
+    text.includes("JUMLAH") && text.includes("SISA SALDO") ||
+    text.includes("NO REK")) {
   return "ATM";
 }
 
@@ -233,7 +234,7 @@ function parseATM(lines) {
     tanggal: "",
     jam: "",
     total: 0,
-    metode: "Tarik Tunai",
+    metode: "ATMi",
     keterangan: "Tarik Tunai ATM"
   };
 
@@ -241,8 +242,12 @@ function parseATM(lines) {
 
     // tanggal
     if (/^\d{2}\/\d{2}\/\d{2}$/.test(lines[i])) {
-      data.tanggal = lines[i];
-    }
+
+  const [tgl, bln, thn] = lines[i].split("/");
+
+  data.tanggal = `${tgl}/${bln}/20${thn}`;
+
+}
 
     // jam
     if (/^\d{2}:\d{2}$/.test(lines[i])) {
@@ -251,19 +256,27 @@ function parseATM(lines) {
 
     // nominal
     if (
-      lines[i].toUpperCase() === "JUMLAH" &&
-      lines[i + 1]
-    ) {
+  lines[i].toUpperCase() === "JUMLAH" &&
+  lines[i + 1]
+) {
 
-      const m = lines[i + 1].match(/RP\s*([\d.]+)/i);
+  const m = lines[i + 1].match(/RP\s*([\d.]+)/i);
 
-      if (m) {
-        data.total = Number(
-          m[1].replace(/\./g, "")
-        );
-      }
+  if (m) {
 
-    }
+    const tarikTunai = Number(
+      m[1].replace(/\./g, "")
+    );
+
+    // Tambahkan biaya admin ATMi
+    data.total = tarikTunai + 7500;
+
+    data.keterangan =
+      `Tarik Tunai Rp${tarikTunai.toLocaleString("id-ID")} + Admin ATMi Rp7.500`;
+
+  }
+
+}
 
     // lokasi ATM
     if (
