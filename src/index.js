@@ -210,11 +210,16 @@ if (update.message.photo) {
     console.log("URL Gambar:", imageUrl);
 
     const lines = await scanAzureVision(
-      imageUrl,
-      env
-    );
+  imageUrl,
+  env
+);
 
-    const data = parseStruk(lines);
+console.log("LINES:", JSON.stringify(lines, null, 2));
+
+const data = parseStruk(lines);
+
+console.log("PARSED:", JSON.stringify(data, null, 2));
+  
 
     // Nama toko
 const toko = lines.find(

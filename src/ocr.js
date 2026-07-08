@@ -14,14 +14,22 @@ export async function scanAzureVision(imageUrl, env) {
     })
   });
 
-  const data = await res.json();
+const data = await res.json();
 
-  const lines =
-    data.readResult?.blocks?.flatMap(
-      block => block.lines.map(line => line.text)
-    ) || [];
+console.log("AZURE RESPONSE:", JSON.stringify(data, null, 2));
 
-  return lines;
+const lines =
+  data.readResult?.blocks?.flatMap(
+    block => block.lines.map(line => line.text)
+  ) || [];
+
+console.log("OCR LINES:", JSON.stringify(lines, null, 2));
+
+return lines;
+
+console.log("OCR LINES:", lines);
+
+return lines;
 
 }
 
