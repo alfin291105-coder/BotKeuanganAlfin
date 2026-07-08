@@ -51,6 +51,14 @@ function detectReceiptType(lines) {
     return "WONDR";
   }
 
+  if (
+  text.includes("TARIK TUNAI") ||
+  text.includes("ATMI") ||
+  text.includes("ATMI")
+) {
+  return "ATM";
+}
+
   if (text.includes("ALFAMART")) {
     return "ALFAMART";
   }
@@ -217,6 +225,60 @@ if (idx !== -1) {
 
 }
 
+function parseATM(lines) {
+
+  const data = {
+    jenis: "Pengeluaran",
+    toko: "ATM BNI",
+    tanggal: "",
+    jam: "",
+    total: 0,
+    metode: "Tarik Tunai",
+    keterangan: "Tarik Tunai ATM"
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+
+    // tanggal
+    if (/^\d{2}\/\d{2}\/\d{2}$/.test(lines[i])) {
+      data.tanggal = lines[i];
+    }
+
+    // jam
+    if (/^\d{2}:\d{2}$/.test(lines[i])) {
+      data.jam = lines[i];
+    }
+
+    // nominal
+    if (
+      lines[i].toUpperCase() === "JUMLAH" &&
+      lines[i + 1]
+    ) {
+
+      const m = lines[i + 1].match(/RP\s*([\d.]+)/i);
+
+      if (m) {
+        data.total = Number(
+          m[1].replace(/\./g, "")
+        );
+      }
+
+    }
+
+    // lokasi ATM
+    if (
+      lines[i].includes("IDM") ||
+      lines[i].includes("ATM")
+    ) {
+      data.toko = lines[i];
+    }
+
+  }
+
+  return data;
+
+}
+
 function parseAlfamart(lines) {
 
   const data = {
@@ -336,6 +398,9 @@ export function parseStruk(lines) {
 
     case "WONDR":
       return parseWondr(lines);
+
+    case "ATM":
+      return parseATM(lines);
 
     default:
       return {
